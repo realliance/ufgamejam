@@ -27,6 +27,7 @@ public class BoardAssembly : MonoBehaviour {
 		foreach (Transform child in parent.transform) {
 			GameObject.Destroy(child.gameObject);
 		}
+		parent.transform.position = new Vector3(-column / 2, -row / 2, 0);
 		GameObject leftLeg = (GameObject)Instantiate(leg);
 		leftLeg.transform.parent = parent.transform;
 		leftLeg.transform.localPosition = Vector3.zero;
