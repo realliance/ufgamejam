@@ -7,6 +7,8 @@ public class BoardAssembly : MonoBehaviour {
 
 	public GameObject hole, leg, parent;
 
+	public RPGCamera cameraScript;
+
 	uint row, column, winNum;
 
 	GameObject[,] holes;
