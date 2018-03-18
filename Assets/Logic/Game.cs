@@ -1,22 +1,42 @@
 ﻿public enum GameType { TwoPlayer, SinglePlayer, SinglePlayerMoveSecond }
 public enum PlayerType { Human, AI }
 public enum GameState { InProgress, Finished }
+public enum EndState { Victory, Tie }
 
-public class AILogic {
+public delegate void MoveCallback(uint column, uint row, uint player);
+public delegate void HumanMoveCallback(uint column, uint row, uint player);
+public delegate void AiMoveCallback(uint column, uint row, uint player);
+public delegate void GameVictoryCallback(uint winningPlayer);
+public delegate void GameTieCallback();
+public delegate void GameFinishedCallback(EndState endState, uint? winningPlayer);
+public delegate void HumanTurnStartCallback(uint player);
+
+public struct Callbacks {
+    public MoveCallback moveCallback;
+    public HumanMoveCallback humanMoveCallback;
+    public AiMoveCallback aiMoveCallback;
+    public GameVictoryCallback gameVictoryCallback;
+    public GameTieCallback gameTieCallback;
+    public GameFinishedCallback gameFinishedCallback;
+    public HumanTurnStartCallback humanTurnStartCallback;
+}
+
+public class AiLogic {
     virtual public uint GetMove(uint?[,] board, uint playerNumber) {
-        throw new System.Exception("Tried to use base AILogic class!");
+        throw new System.Exception("Tried to use base AiLogic class!");
     }
 }
 
 public class Game {
     PlayerType[] players;
     GameState gameState;
-    AILogic ai;
+    AiLogic ai;
     uint length;
     uint height;
     uint?[,] board;
     uint currentPlayer;
     uint winLength;
+    Callbacks callbacks;
 
     uint DropPeg(uint column) {
         for(uint i = 0; i < height; i++) {
@@ -30,10 +50,22 @@ public class Game {
 
     void ProcessWin(uint player) {
         gameState = GameState.Finished;
+        if(callbacks.gameFinishedCallback != null) {
+            callbacks.gameFinishedCallback(EndState.Victory, currentPlayer);
+        }
+        if(callbacks.gameVictoryCallback != null) {
+            callbacks.gameVictoryCallback(currentPlayer);
+        }
     }
 
     void ProcessTie() {
         gameState = GameState.Finished;
+        if(callbacks.gameFinishedCallback != null) {
+            callbacks.gameFinishedCallback(EndState.Tie, null);
+        }
+        if(callbacks.gameTieCallback != null) {
+            callbacks.gameTieCallback();
+        }
     }
 
     bool CheckWin(uint column, uint row, uint player) {
@@ -137,6 +169,12 @@ public class Game {
         while(players[currentPlayer] != PlayerType.Human) {
             uint aiColumn = ai.GetMove(board, currentPlayer);
             uint aiRow = DropPeg(aiColumn);
+            if(callbacks.aiMoveCallback != null) {
+                callbacks.aiMoveCallback(aiColumn, aiRow, currentPlayer);
+            }
+            if(callbacks.moveCallback != null) {
+                callbacks.moveCallback(aiColumn, aiRow, currentPlayer);
+            }
             if(CheckWin(aiColumn, aiRow, currentPlayer)) {
                 ProcessWin(currentPlayer);
                 return;
@@ -151,13 +189,14 @@ public class Game {
                 }
             }
         }
+        if(callbacks.humanTurnStartCallback != null) {
+            callbacks.humanTurnStartCallback(currentPlayer);
+        }
     }
 
-    void Setup(AILogic ai, uint length, uint height, uint winLength, PlayerType[] players) {
-        if(winLength > length) {
-            throw new System.Exception("Win length is greater than board length!");
-        } else if(winLength > height) {
-            throw new System.Exception("Win length is greater than board height!");
+    void Setup(AiLogic ai, Callbacks callbacks, uint length, uint height, uint winLength, PlayerType[] players) {
+        if(winLength > length && winLength > height) {
+            throw new System.Exception("Win length is greater than board length and height!");
         } else if(winLength < 2) {
             throw new System.Exception("Win length is less than two!");
         } else if(players.Length < 2) {
@@ -175,32 +214,66 @@ public class Game {
         currentPlayer = 0;
         board = new uint?[length, height];
         gameState = GameState.InProgress;
+        this.callbacks = callbacks;
+        if(callbacks.humanTurnStartCallback != null) {
+            callbacks.humanTurnStartCallback(currentPlayer);
+        }
     }
 
-    public Game(AILogic ai, uint length, uint height, uint winLength, PlayerType[] players) {
-        Setup(ai, length, height, winLength, players);
+    public Game(AiLogic ai, uint length, uint height, uint winLength, PlayerType[] players) {
+        Setup(ai, new Callbacks(), length, height, winLength, players);
     }
 
-    public Game(AILogic ai, uint length, uint height, uint winLength, GameType gameType) {
+    public Game(AiLogic ai, uint length, uint height, uint winLength, GameType gameType) {
         if(gameType == GameType.TwoPlayer) {
-            Setup(ai, length, height, winLength, new PlayerType[] { PlayerType.Human, PlayerType.Human });
+            Setup(ai, new Callbacks(), length, height, winLength, new PlayerType[] { PlayerType.Human, PlayerType.Human });
         } else if(gameType == GameType.SinglePlayer) {
-            Setup(ai, length, height, winLength, new PlayerType[] { PlayerType.Human, PlayerType.AI });
+            Setup(ai, new Callbacks(), length, height, winLength, new PlayerType[] { PlayerType.Human, PlayerType.AI });
         } else if(gameType == GameType.SinglePlayerMoveSecond) {
-            Setup(ai, length, height, winLength, new PlayerType[] { PlayerType.AI, PlayerType.Human });
+            Setup(ai, new Callbacks(), length, height, winLength, new PlayerType[] { PlayerType.AI, PlayerType.Human });
         }
         throw new System.Exception("Fell threw all gameType checks (This should be impossible)!");
     }
 
-    public Game(AILogic ai, GameType gameType) {
+    public Game(AiLogic ai, GameType gameType) {
         if(gameType == GameType.TwoPlayer) {
-            Setup(ai, 7, 6, 4, new PlayerType[] { PlayerType.Human, PlayerType.Human });
+            Setup(ai, new Callbacks(), 7, 6, 4, new PlayerType[] { PlayerType.Human, PlayerType.Human });
         } else if(gameType == GameType.SinglePlayer) {
-            Setup(ai, 7, 6, 4, new PlayerType[] { PlayerType.Human, PlayerType.AI });
+            Setup(ai, new Callbacks(), 7, 6, 4, new PlayerType[] { PlayerType.Human, PlayerType.AI });
         } else if(gameType == GameType.SinglePlayerMoveSecond) {
-            Setup(ai, 7, 6, 4, new PlayerType[] { PlayerType.AI, PlayerType.Human });
+            Setup(ai, new Callbacks(), 7, 6, 4, new PlayerType[] { PlayerType.AI, PlayerType.Human });
         }
         throw new System.Exception("Fell threw all gameType checks (This should be impossible)!");
+    }
+
+    public Game(AiLogic ai, Callbacks callbacks, uint length, uint height, uint winLength, PlayerType[] players) {
+        Setup(ai, callbacks, length, height, winLength, players);
+    }
+
+    public Game(AiLogic ai, Callbacks callbacks, uint length, uint height, uint winLength, GameType gameType) {
+        if(gameType == GameType.TwoPlayer) {
+            Setup(ai, callbacks, length, height, winLength, new PlayerType[] { PlayerType.Human, PlayerType.Human });
+        } else if(gameType == GameType.SinglePlayer) {
+            Setup(ai, callbacks, length, height, winLength, new PlayerType[] { PlayerType.Human, PlayerType.AI });
+        } else if(gameType == GameType.SinglePlayerMoveSecond) {
+            Setup(ai, callbacks, length, height, winLength, new PlayerType[] { PlayerType.AI, PlayerType.Human });
+        }
+        throw new System.Exception("Fell threw all gameType checks (This should be impossible)!");
+    }
+
+    public Game(AiLogic ai, Callbacks callbacks, GameType gameType) {
+        if(gameType == GameType.TwoPlayer) {
+            Setup(ai, callbacks, 7, 6, 4, new PlayerType[] { PlayerType.Human, PlayerType.Human });
+        } else if(gameType == GameType.SinglePlayer) {
+            Setup(ai, callbacks, 7, 6, 4, new PlayerType[] { PlayerType.Human, PlayerType.AI });
+        } else if(gameType == GameType.SinglePlayerMoveSecond) {
+            Setup(ai, callbacks, 7, 6, 4, new PlayerType[] { PlayerType.AI, PlayerType.Human });
+        }
+        throw new System.Exception("Fell threw all gameType checks (This should be impossible)!");
+    }
+
+    public void SetCallbacks(Callbacks callbacks) {
+        this.callbacks = callbacks;
     }
 
     public bool Move(uint column) {
@@ -213,6 +286,12 @@ public class Game {
         }
 
         uint newPegRow = DropPeg(column);
+        if(callbacks.humanMoveCallback != null) {
+            callbacks.humanMoveCallback(column, newPegRow, currentPlayer);
+        }
+        if(callbacks.moveCallback != null) {
+            callbacks.moveCallback(column, newPegRow, currentPlayer);
+        }
         ProcessGame(column, newPegRow);
         return true;
     }
