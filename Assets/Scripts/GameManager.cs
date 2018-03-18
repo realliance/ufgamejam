@@ -96,7 +96,7 @@ public class GameManager : MonoBehaviour {
 	}
 
 	public void Play() {
-		AILogic ai = new AILogic();
+		AiLogic ai = new AiLogic();
 		PlayerType[] players = new PlayerType[2];
 		players[0] = playerOne.value == 0 ? PlayerType.Human : PlayerType.AI;
 		players[0] = playerTwo.value == 0 ? PlayerType.Human : PlayerType.AI;
