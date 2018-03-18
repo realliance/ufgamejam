@@ -4791,6 +4791,7 @@ MonoBehaviour:
   height: {fileID: 52629164}
   winNum: {fileID: 217020625}
   boardAssembler: {fileID: 2024031001}
+  gameManager: {fileID: 2060393971}
 --- !u!1 &2026155710
 GameObject:
   m_ObjectHideFlags: 0
@@ -4907,9 +4908,16 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   winTextPrefix: '# to Win: '
   winText: {fileID: 217020627}
+  widthObj: {fileID: 2068601529}
+  heightObj: {fileID: 52629164}
+  optionDropdown: {fileID: 1597474008}
+  playButton: {fileID: 263343820}
   boardAssembler: {fileID: 2024031001}
   playerOne: {fileID: 391324284}
   playerTwo: {fileID: 452140440}
+  blueToken: {fileID: 1663748876807906, guid: 325a8a82b6f89ad4e92bae87d460ec90, type: 2}
+  orangeToken: {fileID: 1425486114936414, guid: ef1bad8e61925a44c8c78c1e7673708c,
+    type: 2}
 --- !u!1 &2068601529
 GameObject:
   m_ObjectHideFlags: 0

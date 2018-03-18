@@ -7,6 +7,7 @@ public class ShowCustom : MonoBehaviour {
 	public GameObject width, height, winNum;
 
 	public BoardAssembly boardAssembler;
+	public GameManager gameManager;
 
 	// Use this for initialization
 	void Start () {
@@ -21,6 +22,7 @@ public class ShowCustom : MonoBehaviour {
 		winNum.SetActive(value == 1);
 		if (value == 0) {
 			boardAssembler.RevertToStandard();
+			gameManager.RevertToStandard();
 		}
 	}
 

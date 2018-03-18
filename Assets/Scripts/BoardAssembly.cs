@@ -5,10 +5,11 @@ using UnityEngine.UI;
 
 public class BoardAssembly : MonoBehaviour {
 
-
 	public GameObject hole, leg, parent;
 
 	uint row, column, winNum;
+
+	GameObject[,] holes;
 
 	public float firstColumnOffset, columnYoffset, rightLegOffset = 0f;
 
@@ -27,6 +28,7 @@ public class BoardAssembly : MonoBehaviour {
 		foreach (Transform child in parent.transform) {
 			GameObject.Destroy(child.gameObject);
 		}
+		holes = new GameObject[column, row];
 		parent.transform.position = new Vector3(-(float)column / 2, -(float)row / 2, 0);
 		GameObject leftLeg = (GameObject)Instantiate(leg);
 		leftLeg.transform.parent = parent.transform;
@@ -39,6 +41,7 @@ public class BoardAssembly : MonoBehaviour {
 				GameObject rowObj = (GameObject)Instantiate(hole, Vector3.zero, Quaternion.identity);
 				rowObj.transform.parent = columnObj.transform;
 				rowObj.transform.localPosition = new Vector3(0, -r, 0);
+				holes[c, r] = rowObj;
 			}
 		}
 		GameObject rightLeg = (GameObject)Instantiate(leg);
@@ -91,5 +94,9 @@ public class BoardAssembly : MonoBehaviour {
 
 	public uint GetRows() {
 		return row;
+	}
+
+	public GameObject[,] GetHoles() {
+		return holes;
 	}
 }

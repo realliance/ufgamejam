@@ -19,8 +19,8 @@ public class Game {
     uint winLength;
 
     uint DropPeg(uint column) {
-        for(uint i = 0; i < column; i++) {
-            if(board[column, i] != null) {
+        for(uint i = 0; i < height; i++) {
+            if(board[column, i] == null) {
                 board[column, i] = currentPlayer;
                 return i;
             }

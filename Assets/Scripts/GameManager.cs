@@ -8,12 +8,20 @@ public class GameManager : MonoBehaviour {
 	public string winTextPrefix = "# to Win: ";
 	public Text winText;
 
+	public GameObject widthObj, heightObj, optionDropdown, playButton;
+
 	private Game game;
 	public BoardAssembly boardAssembler;
 
 	uint winNum;
 
 	public Dropdown playerOne, playerTwo;
+
+	bool turnDone = false;
+
+	public GameObject blueToken, orangeToken;
+	GameObject token;
+	uint currentTokenPosition;
 
 	void updateText() {
 		winText.text = winTextPrefix + winNum;
@@ -25,6 +33,65 @@ public class GameManager : MonoBehaviour {
 		updateText();
 	}
 
+	public void Update() {
+		if (token != null) {
+			if (Input.GetButtonDown("Horizontal")) {
+				if (Input.GetAxis("Horizontal") > 0) {
+					currentTokenPosition++;
+					if (boardAssembler.GetColumns() == currentTokenPosition) {
+						currentTokenPosition = 0;
+					}
+				} else {
+					if (currentTokenPosition == 0) {
+						currentTokenPosition = boardAssembler.GetColumns();
+					}
+					currentTokenPosition--;
+				}
+				token.transform.parent = boardAssembler.GetHoles()[currentTokenPosition,0].transform.parent.transform;
+				token.transform.localPosition = new Vector3(0, token.transform.localPosition.y, token.transform.localPosition.z);
+			}
+			if (Input.GetButtonDown("Submit")) {
+				if (game.Move(currentTokenPosition)) {
+					for(int i = 0; i < boardAssembler.GetRows(); i++) {
+						if (game.GetBoard()[currentTokenPosition, i] != null) {
+							token.transform.parent = boardAssembler.GetHoles()[currentTokenPosition, (boardAssembler.GetRows() - 1) - i].transform;
+							token.transform.localPosition = Vector3.zero;
+							break;
+						}
+					}
+					token = null;
+					turnDone = true;
+				}
+			}
+		}
+	}
+
+	bool TurnDone() {
+		return turnDone;
+	}
+
+	public IEnumerator StartTurns() {
+		while(game.GetGameState() == GameState.InProgress) {
+			Debug.Log(game.GetCurrentPlayer());
+			token = (GameObject)Instantiate(game.GetCurrentPlayer() == 0 ? blueToken : orangeToken, Vector3.zero, Quaternion.identity);
+			token.transform.parent = boardAssembler.GetHoles()[0,0].transform.parent.transform;
+			token.transform.localPosition = new Vector3(0, boardAssembler.GetHoles()[0,0].transform.localPosition.y + boardAssembler.columnYoffset, boardAssembler.GetHoles()[0,0].transform.localPosition.z);
+			currentTokenPosition = 0;
+			yield return new WaitUntil(TurnDone);
+			turnDone = false;
+		}
+	}
+
+	public void ToggleUI(bool visible) {
+		playerOne.gameObject.SetActive(visible);	
+		playerTwo.gameObject.SetActive(visible);
+		winText.gameObject.SetActive(visible);
+		widthObj.SetActive(visible);
+		heightObj.SetActive(visible);
+		optionDropdown.SetActive(visible);
+		playButton.SetActive(visible);
+	}
+
 	public void Play() {
 		AILogic ai = new AILogic();
 		PlayerType[] players = new PlayerType[2];
@@ -32,6 +99,9 @@ public class GameManager : MonoBehaviour {
 		players[0] = playerTwo.value == 0 ? PlayerType.Human : PlayerType.AI;
 
 		game = new Game(ai, boardAssembler.GetColumns(), boardAssembler.GetRows(), winNum, players);
+		ToggleUI(false);
+	
+		StartCoroutine(StartTurns());
 	}
 
 	public void AddNum() {
@@ -44,5 +114,10 @@ public class GameManager : MonoBehaviour {
 			winNum--;
 			updateText();
 		}
+	}
+
+	public void RevertToStandard() {
+		winNum = 4;
+		updateText();
 	}
 }
