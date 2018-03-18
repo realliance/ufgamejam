@@ -41,7 +41,7 @@ public class BoardAssembly : MonoBehaviour {
 				GameObject rowObj = (GameObject)Instantiate(hole, Vector3.zero, Quaternion.identity);
 				rowObj.transform.parent = columnObj.transform;
 				rowObj.transform.localPosition = new Vector3(0, -r, 0);
-				holes[c, r] = rowObj;
+				holes[c, (row - 1) - r] = rowObj;
 			}
 		}
 		GameObject rightLeg = (GameObject)Instantiate(leg);

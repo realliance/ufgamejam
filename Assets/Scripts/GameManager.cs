@@ -53,7 +53,7 @@ public class GameManager : MonoBehaviour {
 			if (Input.GetButtonDown("Submit")) {
 				if (game.Move(currentTokenPosition)) {
 					for(int i = 0; i < boardAssembler.GetRows(); i++) {
-						if (game.GetBoard()[currentTokenPosition, i] != null) {
+						if (game.GetBoard()[currentTokenPosition, (boardAssembler.GetRows() - 1) - i] != null) {
 							token.transform.parent = boardAssembler.GetHoles()[currentTokenPosition, (boardAssembler.GetRows() - 1) - i].transform;
 							token.transform.localPosition = Vector3.zero;
 							break;
@@ -66,18 +66,14 @@ public class GameManager : MonoBehaviour {
 		}
 	}
 
-	bool TurnDone() {
-		return turnDone;
-	}
-
 	public IEnumerator StartTurns() {
 		while(game.GetGameState() == GameState.InProgress) {
 			Debug.Log(game.GetCurrentPlayer());
 			token = (GameObject)Instantiate(game.GetCurrentPlayer() == 0 ? blueToken : orangeToken, Vector3.zero, Quaternion.identity);
-			token.transform.parent = boardAssembler.GetHoles()[0,0].transform.parent.transform;
-			token.transform.localPosition = new Vector3(0, boardAssembler.GetHoles()[0,0].transform.localPosition.y + boardAssembler.columnYoffset, boardAssembler.GetHoles()[0,0].transform.localPosition.z);
+			token.transform.parent = boardAssembler.GetHoles()[0, boardAssembler.GetRows() - 1].transform.parent.transform;
+			token.transform.localPosition = new Vector3(0, boardAssembler.GetHoles()[0,boardAssembler.GetRows() - 1].transform.localPosition.y + boardAssembler.columnYoffset, boardAssembler.GetHoles()[0,boardAssembler.GetRows() - 1].transform.localPosition.z);
 			currentTokenPosition = 0;
-			yield return new WaitUntil(TurnDone);
+			yield return new WaitUntil(() => turnDone);
 			turnDone = false;
 		}
 	}
