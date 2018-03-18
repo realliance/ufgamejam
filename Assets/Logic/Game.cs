@@ -114,7 +114,7 @@ public class Game {
 
     bool CheckTie() {
         for(uint i = 0; i < length; i++) {
-            if(board[i, height - 1] != null) {
+            if(board[i, height - 1] == null) {
                 return false;
             }
         }
@@ -129,7 +129,11 @@ public class Game {
             ProcessTie();
             return;
         }
-        currentPlayer++;
+        if(currentPlayer == players.Length - 1) {
+            currentPlayer = 0;
+        } else {
+            currentPlayer++;
+        }
         while(players[currentPlayer] != PlayerType.Human) {
             uint aiColumn = ai.GetMove(board, currentPlayer);
             uint aiRow = DropPeg(aiColumn);
@@ -140,7 +144,11 @@ public class Game {
                 ProcessTie();
                 return;
             } else {
-                currentPlayer++;
+                if(currentPlayer == players.Length - 1) {
+                    currentPlayer = 0;
+                } else {
+                    currentPlayer++;
+                }
             }
         }
     }
