@@ -23,6 +23,12 @@ public class GameManager : MonoBehaviour {
 	GameObject token;
 	uint currentTokenPosition;
 
+	public Text turnText;
+	public string bluesTurn = "Blues Turn";
+	public Color32 blue;
+	public string orangesTurn = "Oranges Turn";
+	public Color32 orange;
+
 	void updateText() {
 		winText.text = winTextPrefix + winNum;
 	}
@@ -68,7 +74,8 @@ public class GameManager : MonoBehaviour {
 
 	public IEnumerator StartTurns() {
 		while(game.GetGameState() == GameState.InProgress) {
-			Debug.Log(game.GetCurrentPlayer());
+			turnText.text = game.GetCurrentPlayer() == 0 ? bluesTurn : orangesTurn;
+			turnText.color = game.GetCurrentPlayer() == 0 ? blue : orange;
 			token = (GameObject)Instantiate(game.GetCurrentPlayer() == 0 ? blueToken : orangeToken, Vector3.zero, Quaternion.identity);
 			token.transform.parent = boardAssembler.GetHoles()[0, boardAssembler.GetRows() - 1].transform.parent.transform;
 			token.transform.localPosition = new Vector3(0, boardAssembler.GetHoles()[0,boardAssembler.GetRows() - 1].transform.localPosition.y + boardAssembler.columnYoffset, boardAssembler.GetHoles()[0,boardAssembler.GetRows() - 1].transform.localPosition.z);
