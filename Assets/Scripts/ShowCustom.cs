@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class ShowCustom : MonoBehaviour {
 
-	public GameObject width, height, winNum;
+	public GameObject width, height, winNum, bg, bgMid;
 
 	public BoardAssembly boardAssembler;
 	public GameManager gameManager;
@@ -14,13 +14,17 @@ public class ShowCustom : MonoBehaviour {
 		width.SetActive(false);
 		height.SetActive(false);
 		winNum.SetActive(false);
+        bg.SetActive(false);
+        bgMid.SetActive(false);
 	}
 
 	public void DropdownChanged(int value) {
 		width.SetActive(value == 1);
 		height.SetActive(value == 1);
 		winNum.SetActive(value == 1);
-		if (value == 0) {
+        bg.SetActive(value == 1);
+        bgMid.SetActive(value == 1);
+        if (value == 0) {
 			boardAssembler.RevertToStandard();
 			gameManager.RevertToStandard();
 		}
