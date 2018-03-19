@@ -34,7 +34,8 @@ public class BoardAssembly : MonoBehaviour {
 		parent.transform.position = new Vector3(-(float)column / 2, -(float)row / 2, 0);
 		GameObject leftLeg = (GameObject)Instantiate(leg);
 		leftLeg.transform.parent = parent.transform;
-		leftLeg.transform.localPosition = Vector3.zero;
+		leftLeg.transform.localScale = new Vector3(leftLeg.transform.localScale.x, (0.12f * row) + 0.28f, leftLeg.transform.localScale.z);
+		leftLeg.transform.localPosition = new Vector3(0, 0.2f * (((int)row - 6) < 0f ? -Mathf.Abs((int)row - 6) : (int)row - 6), 0);
 		for (int c = 0; c <= column - 1; c++) {
 			GameObject columnObj = new GameObject("Column" + c);
 			columnObj.transform.parent = parent.transform;
@@ -48,9 +49,10 @@ public class BoardAssembly : MonoBehaviour {
 		}
 		GameObject rightLeg = (GameObject)Instantiate(leg);
 		rightLeg.transform.parent = parent.transform;
-		rightLeg.transform.localPosition = new Vector3(firstColumnOffset + column + rightLegOffset, 0 , 0);
+		rightLeg.transform.localScale = new Vector3(rightLeg.transform.localScale.x, (0.12f * row) + 0.28f, rightLeg.transform.localScale.z);
+		rightLeg.transform.localPosition = new Vector3(firstColumnOffset + column + rightLegOffset, 0.2f * (((int)row - 6) < 0 ? -Mathf.Abs((int)row - 6) : (int)row - 6), 0);
 		table.transform.position = new Vector3(table.transform.position.x, -((row * 0.5f) + 1.7f), table.transform.position.z);
-		table.transform.localScale = new Vector3(2.5f * column, 1, 2.5f * column);
+		table.transform.localScale = new Vector3(3.25f * column, 1, 3.25f * column);
 		updateText();
 	}
 
