@@ -5,7 +5,7 @@ using UnityEngine.UI;
 
 public class BoardAssembly : MonoBehaviour {
 
-	public GameObject hole, leg, parent;
+	public GameObject hole, leg, parent, table;
 
 	public RPGCamera cameraScript;
 
@@ -49,6 +49,8 @@ public class BoardAssembly : MonoBehaviour {
 		GameObject rightLeg = (GameObject)Instantiate(leg);
 		rightLeg.transform.parent = parent.transform;
 		rightLeg.transform.localPosition = new Vector3(firstColumnOffset + column + rightLegOffset, 0 , 0);
+		table.transform.position = new Vector3(table.transform.position.x, -((row * 0.5f) + 1.7f), table.transform.position.z);
+		table.transform.localScale = new Vector3(2.5f * column, 1, 2.5f * column);
 		updateText();
 	}
 
