@@ -48,7 +48,7 @@ public class GameManager : MonoBehaviour {
 	public void Update() {
 		if (token != null) {
 			if (Input.GetButtonDown("Horizontal")) {
-				if (Input.GetAxis("Horizontal") > 0) {
+				if (Input.GetAxisRaw("Horizontal") > 0) {
 					currentTokenPosition++;
 					if (boardAssembler.GetColumns() == currentTokenPosition) {
 						currentTokenPosition = 0;
@@ -100,10 +100,10 @@ public class GameManager : MonoBehaviour {
 		tokenRigidbodies.Add(token.GetComponent<Rigidbody>());
 		newTokenRef = token;
 		token = null;
-
+		
+		newTokenRef.transform.parent = boardAssembler.GetHoles()[column, row].transform;
 		startingY = newTokenRef.transform.localPosition.y;
 
-		newTokenRef.transform.parent = boardAssembler.GetHoles()[column, row].transform;
 		fall = true;
 
 	}
