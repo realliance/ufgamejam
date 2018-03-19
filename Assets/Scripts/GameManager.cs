@@ -146,7 +146,7 @@ public class GameManager : MonoBehaviour {
 		AiLogic ai = new AiLogic();
 		PlayerType[] players = new PlayerType[2];
 		players[0] = playerOne.value == 0 ? PlayerType.Human : PlayerType.AI;
-		players[0] = playerTwo.value == 0 ? PlayerType.Human : PlayerType.AI;
+		players[1] = playerTwo.value == 0 ? PlayerType.Human : PlayerType.AI;
 
 
 		Callbacks callbacks = new Callbacks();
