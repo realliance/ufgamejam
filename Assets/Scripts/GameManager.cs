@@ -57,32 +57,34 @@ public class GameManager : MonoBehaviour {
 				token.transform.localPosition = new Vector3(0, token.transform.localPosition.y, token.transform.localPosition.z);
 			}
 			if (Input.GetButtonDown("Submit")) {
-				if (game.Move(currentTokenPosition)) {
-					for(int i = 0; i < boardAssembler.GetRows(); i++) {
-						if (game.GetBoard()[currentTokenPosition, (boardAssembler.GetRows() - 1) - i] != null) {
-							token.transform.parent = boardAssembler.GetHoles()[currentTokenPosition, (boardAssembler.GetRows() - 1) - i].transform;
-							token.transform.localPosition = Vector3.zero;
-							break;
-						}
-					}
-					token = null;
-					turnDone = true;
-				}
+				game.Move(currentTokenPosition);
 			}
 		}
 	}
 
-	public IEnumerator StartTurns() {
-		while(game.GetGameState() == GameState.InProgress) {
-			turnText.text = game.GetCurrentPlayer() == 0 ? bluesTurn : orangesTurn;
-			turnText.color = game.GetCurrentPlayer() == 0 ? blue : orange;
-			token = (GameObject)Instantiate(game.GetCurrentPlayer() == 0 ? blueToken : orangeToken, Vector3.zero, Quaternion.identity);
-			token.transform.parent = boardAssembler.GetHoles()[0, boardAssembler.GetRows() - 1].transform.parent.transform;
-			token.transform.localPosition = new Vector3(0, boardAssembler.GetHoles()[0,boardAssembler.GetRows() - 1].transform.localPosition.y + boardAssembler.columnYoffset, boardAssembler.GetHoles()[0,boardAssembler.GetRows() - 1].transform.localPosition.z);
-			currentTokenPosition = 0;
-			yield return new WaitUntil(() => turnDone);
-			turnDone = false;
-		}
+	public void OnHumansTurnStart(uint player) {
+		turnText.text = player == 0 ? bluesTurn : orangesTurn;
+		turnText.color = player == 0 ? blue : orange;
+		token = (GameObject)Instantiate(player == 0 ? blueToken : orangeToken, Vector3.zero, Quaternion.identity);
+		token.transform.parent = boardAssembler.GetHoles()[0, boardAssembler.GetRows() - 1].transform.parent.transform;
+		token.transform.localPosition = new Vector3(0, boardAssembler.GetHoles()[0,boardAssembler.GetRows() - 1].transform.localPosition.y + boardAssembler.columnYoffset, boardAssembler.GetHoles()[0,boardAssembler.GetRows() - 1].transform.localPosition.z);
+		currentTokenPosition = 0;
+	}
+
+	public void OnMove(uint column, uint row, uint player) {
+		token.transform.parent = boardAssembler.GetHoles()[column, row].transform;
+		token.transform.localPosition = Vector3.zero;
+		token = null;
+	}
+
+	public void OnGameWin(uint winningPlayer) {
+		turnText.text = (winningPlayer == 0 ? "Blue" : "Orange") + " Wins!";
+		turnText.color = winningPlayer == 0 ? blue : orange;
+	}
+
+	public void OnGameTie() {
+		turnText.text = "Tie!";
+		turnText.color = Color.black;
 	}
 
 	public void ToggleUI(bool visible) {
@@ -101,10 +103,14 @@ public class GameManager : MonoBehaviour {
 		players[0] = playerOne.value == 0 ? PlayerType.Human : PlayerType.AI;
 		players[0] = playerTwo.value == 0 ? PlayerType.Human : PlayerType.AI;
 
-		game = new Game(ai, boardAssembler.GetColumns(), boardAssembler.GetRows(), winNum, players);
+
+		Callbacks callbacks = new Callbacks();
+		callbacks.humanTurnStartCallback = OnHumansTurnStart;
+		callbacks.gameVictoryCallback = OnGameWin;
+		callbacks.moveCallback = OnMove;
+		callbacks.gameTieCallback = OnGameTie;
+		game = new Game(ai, callbacks, boardAssembler.GetColumns(), boardAssembler.GetRows(), winNum, players);
 		ToggleUI(false);
-	
-		StartCoroutine(StartTurns());
 	}
 
 	public void AddNum() {
