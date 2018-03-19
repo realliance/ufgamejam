@@ -2,13 +2,14 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.SceneManagement;
 
 public class GameManager : MonoBehaviour {
 
 	public string winTextPrefix = "# to Win: ";
-	public Text winText;
+	public Text winText, errorText;
 
-	public GameObject widthObj, heightObj, optionDropdown, playButton;
+	public GameObject widthObj, heightObj, optionDropdown, playButton, playAgainButton;
 
 	private Game game;
 	public BoardAssembly boardAssembler;
@@ -127,6 +128,7 @@ public class GameManager : MonoBehaviour {
 
 	public void OnGameDone(EndState endState, uint? winningPlayer) {
 		StartCoroutine(DelayUntilFall());
+		playAgainButton.SetActive(true);
 	}
 
 	public void ToggleUI(bool visible) {
@@ -137,6 +139,7 @@ public class GameManager : MonoBehaviour {
 		heightObj.SetActive(visible);
 		optionDropdown.SetActive(visible);
 		playButton.SetActive(visible);
+		errorText.gameObject.SetActive(visible);
 	}
 
 	public void Play() {
@@ -152,8 +155,17 @@ public class GameManager : MonoBehaviour {
 		callbacks.moveCallback = OnMove;
 		callbacks.gameTieCallback = OnGameTie;
 		callbacks.gameFinishedCallback = OnGameDone;
-		game = new Game(ai, callbacks, boardAssembler.GetColumns(), boardAssembler.GetRows(), winNum, players);
-		ToggleUI(false);
+		try {
+			game = new Game(ai, callbacks, boardAssembler.GetColumns(), boardAssembler.GetRows(), winNum, players);
+			ToggleUI(false);
+		} catch {
+			errorText.gameObject.SetActive(true);
+			errorText.text = "Board is Not Legal (Check to make sure it is playable!)";
+		}
+	}
+
+	public void RestartGame() {
+		SceneManager.LoadScene(0);
 	}
 
 	public void AddNum() {
