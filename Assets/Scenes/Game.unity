@@ -2789,7 +2789,7 @@ MonoBehaviour:
   bg: {fileID: 285578954}
   bgMid: {fileID: 1609267392}
   boardAssembler: {fileID: 1041807988}
-  gameManager: {fileID: 0}
+  gameManager: {fileID: 2060393971}
 --- !u!114 &1041807990
 MonoBehaviour:
   m_ObjectHideFlags: 0
