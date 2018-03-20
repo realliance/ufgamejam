@@ -13,6 +13,7 @@ public class GameManager : MonoBehaviour {
 
 	private Game game;
 	public BoardAssembly boardAssembler;
+	public ShowCustom showCustom;
 
 	uint winNum;
 
@@ -100,7 +101,7 @@ public class GameManager : MonoBehaviour {
 		tokenRigidbodies.Add(token.GetComponent<Rigidbody>());
 		newTokenRef = token;
 		token = null;
-		
+
 		newTokenRef.transform.parent = boardAssembler.GetHoles()[column, row].transform;
 		startingY = newTokenRef.transform.localPosition.y;
 
@@ -157,6 +158,7 @@ public class GameManager : MonoBehaviour {
 		callbacks.gameFinishedCallback = OnGameDone;
 		try {
 			game = new Game(ai, callbacks, boardAssembler.GetColumns(), boardAssembler.GetRows(), winNum, players);
+			showCustom.SetActiveElements(0);
 			ToggleUI(false);
 		} catch {
 			errorText.gameObject.SetActive(true);

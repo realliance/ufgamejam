@@ -18,12 +18,16 @@ public class ShowCustom : MonoBehaviour {
         bgMid.SetActive(false);
 	}
 
-	public void DropdownChanged(int value) {
+	public void SetActiveElements(int value) {
 		width.SetActive(value == 1);
 		height.SetActive(value == 1);
 		winNum.SetActive(value == 1);
         bg.SetActive(value == 1);
         bgMid.SetActive(value == 1);
+	}
+
+	public void DropdownChanged(int value) {
+		SetActiveElements(value);
         if (value == 0) {
 			boardAssembler.RevertToStandard();
 			gameManager.RevertToStandard();
