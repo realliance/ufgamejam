@@ -22,7 +22,7 @@ public struct Callbacks {
 }
 
 public class AiLogic {
-    virtual public uint GetMove(uint?[,] board, uint playerNumber) {
+    virtual public uint GetMove(uint?[,] board, uint playerNumber, int playerCount, uint winLength) {
         throw new System.Exception("Tried to use base AiLogic class!");
     }
 }
@@ -167,7 +167,7 @@ public class Game {
             currentPlayer++;
         }
         while(players[currentPlayer] != PlayerType.Human) {
-            uint aiColumn = ai.GetMove(board, currentPlayer);
+            uint aiColumn = ai.GetMove(board, currentPlayer, players.Length, winLength);
             uint aiRow = DropPeg(aiColumn);
             if(callbacks.aiMoveCallback != null) {
                 callbacks.aiMoveCallback(aiColumn, aiRow, currentPlayer);
