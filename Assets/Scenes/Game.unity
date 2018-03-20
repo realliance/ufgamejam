@@ -4619,7 +4619,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 0.030944824, y: -164.33023}
+  m_AnchoredPosition: {x: 0.030987, y: -122.84}
   m_SizeDelta: {x: 183.87, y: 88.05}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1609267394
@@ -6139,7 +6139,7 @@ MonoBehaviour:
   playerOne: {fileID: 1529073920}
   playerTwo: {fileID: 830577840}
   fallingGravity: 0.5
-  waitUntilFall: 7
+  waitUntilFall: 2
   blueToken: {fileID: 1663748876807906, guid: 325a8a82b6f89ad4e92bae87d460ec90, type: 2}
   orangeToken: {fileID: 1425486114936414, guid: ef1bad8e61925a44c8c78c1e7673708c,
     type: 2}
